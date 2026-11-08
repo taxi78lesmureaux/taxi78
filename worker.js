@@ -21,8 +21,56 @@ async function handleBooking(request,env){
  const ref='TD78-'+Date.now().toString(36).toUpperCase()+'-'+crypto.randomUUID().slice(0,6).toUpperCase();
  const fields=[['Référence',ref],['Statut','EN ATTENTE DE CONFIRMATION'],['Nom',b.nom],['Téléphone',b.telephone],['Email',b.email||'Non communiqué'],['Véhicule demandé',b.type],['Départ',b.depart],['Destination',b.destination],['Date souhaitée',b.date],['Heure souhaitée',b.heure],['Aller-retour',b.retour?'Oui':'Non']];
  const plain=fields.map(([k,v])=>k+' : '+v).join('\n')+'\n\nACTION ADMIN : contacter le client pour confirmer ou refuser selon disponibilité. Aucune réservation n’est confirmée automatiquement.';
+ // Escape every client-supplied value before interpolating into HTML.
+ const esc=(v)=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+ const row=(label,value)=>'<tr><td style="padding:11px 0;border-bottom:1px solid #e9eef2;color:#607487;font:12px Arial,sans-serif;vertical-align:top;width:35%;">'+esc(label)+'</td><td style="padding:11px 0;border-bottom:1px solid #e9eef2;color:#102d41;font:600 14px Arial,sans-serif;vertical-align:top;overflow-wrap:anywhere;word-break:break-word;">'+esc(value)+'</td></tr>';
+ const safeTel=b.telephone.replace(/[^+0-9]/g,'');
+ const safeDate=/^\d{4}-\d{2}-\d{2}$/.test(b.date)?b.date.slice(8,10)+'/'+b.date.slice(5,7)+'/'+b.date.slice(0,4):b.date;
+ const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'+
+ '<body style="margin:0;padding:0;background:#f1f5f8;color:#102d41;font-family:Arial,Helvetica,sans-serif;">'+
+ '<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Nouvelle demande de trajet à traiter — '+esc(b.nom)+' — '+esc(safeDate)+' à '+esc(b.heure)+'</div>'+
+ '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f1f5f8;"><tr><td align="center" style="padding:24px 12px;">'+
+ '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:620px;background:#ffffff;border-radius:16px;overflow:hidden;">'+
+ '<tr><td style="background:#06364e;padding:25px 26px;border-bottom:4px solid #1fb7b0;">'+
+ '<div style="color:#ffffff;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-1px;">Taxi<span style="color:#58d9d3;">Direct</span> <span style="color:#f4c44b;">78</span></div>'+
+ '<div style="color:#d0e6ec;font-size:13px;margin-top:7px;">Gestion des demandes de réservation</div></td></tr>'+
+ '<tr><td style="padding:25px 26px 8px;">'+
+ '<span style="display:inline-block;padding:9px 12px;border-radius:7px;border:1px solid #f2d58c;background:#fff6da;color:#795015;font-size:11px;line-height:1.4;font-weight:800;letter-spacing:.04em;">● EN ATTENTE DE CONFIRMATION</span>'+
+ '<h1 style="margin:18px 0 7px;font-size:25px;line-height:1.25;color:#0a2d42;">Nouvelle demande de trajet</h1>'+
+ '<p style="margin:0;color:#607487;font-size:14px;line-height:1.65;">Un client souhaite réserver un trajet. Vérifiez les informations puis contactez-le pour confirmer la disponibilité.</p></td></tr>'+
+ '<tr><td style="padding:16px 26px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef9f8;border:1px solid #cdeae6;border-radius:10px;"><tr><td style="padding:16px;">'+
+ '<div style="color:#387b84;font-size:10px;font-weight:800;letter-spacing:.1em;">RÉFÉRENCE DE DEMANDE</div>'+
+ '<div style="color:#07374d;font-size:18px;font-weight:800;line-height:1.55;overflow-wrap:anywhere;">'+esc(ref)+'</div>'+
+ '</td></tr></table></td></tr>'+
+ '<tr><td style="padding:20px 26px 4px;">'+
+ '<h2 style="margin:0 0 5px;color:#086c77;font-size:15px;font-weight:800;">01 · Coordonnées du client</h2>'+
+ '<table role="presentation" cellpadding="0" cellspacing="0" width="100%">'+
+ row('Nom',b.nom)+row('Téléphone',b.telephone)+row('Email',b.email||'Non communiqué')+
+ '</table></td></tr>'+
+ '<tr><td style="padding:22px 26px 6px;">'+
+ '<h2 style="margin:0 0 12px;color:#086c77;font-size:15px;font-weight:800;">02 · Détails du trajet</h2>'+
+ '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f6f9fb;border:1px solid #e8eef1;border-radius:10px;"><tr><td style="padding:16px 18px;">'+
+ '<div style="font-size:10px;font-weight:800;color:#718794;letter-spacing:.08em;">DÉPART</div>'+
+ '<div style="margin-top:5px;font-size:16px;font-weight:800;color:#0d3348;line-height:1.45;overflow-wrap:anywhere;">'+esc(b.depart)+'</div>'+
+ '<div style="margin:12px 0 12px;border-left:2px dashed #60c7c3;height:22px;margin-left:4px;"></div>'+
+ '<div style="font-size:10px;font-weight:800;color:#718794;letter-spacing:.08em;">DESTINATION</div>'+
+ '<div style="margin-top:5px;font-size:16px;font-weight:800;color:#0d3348;line-height:1.45;overflow-wrap:anywhere;">'+esc(b.destination)+'</div>'+
+ '</td></tr></table>'+
+ '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:9px;">'+
+ row('Date',safeDate)+row('Heure',b.heure)+row('Véhicule',b.type)+row('Aller-retour',b.retour?'Oui':'Non')+
+ '</table></td></tr>'+
+ '<tr><td style="padding:18px 26px 6px;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#fff9e9;border:1px solid #f5e5ac;border-radius:10px;"><tr><td style="padding:17px 18px;">'+
+ '<div style="font-size:13px;color:#76500e;font-weight:800;margin-bottom:7px;">03 · Action administrateur</div>'+
+ '<div style="font-size:13px;color:#594826;line-height:1.7;">Contactez le client pour <strong>confirmer ou refuser</strong> la course selon les disponibilités. Aucune réservation n’est confirmée automatiquement.</div>'+
+ '</td></tr></table></td></tr>'+
+ '<tr><td align="center" style="padding:23px 26px 29px;">'+
+ '<a href="tel:'+esc(safeTel)+'" style="display:block;text-align:center;background:#076f78;color:#ffffff;text-decoration:none;border-radius:9px;padding:16px 18px;font-size:15px;font-weight:800;">Appeler le client · '+esc(b.telephone)+'</a>'+
+ (b.email?'<div style="margin-top:15px;font-size:13px;"><a href="mailto:'+esc(b.email)+'" style="color:#087a82;text-decoration:underline;">Écrire au client par email</a></div>':'')+
+ '</td></tr>'+
+ '<tr><td style="background:#f5f8fa;padding:18px 24px;text-align:center;color:#6b8090;font-size:11px;line-height:1.65;">Notification automatique TaxiDirect 78 · Demande non confirmée<br>Ce message contient des informations destinées à la gestion de la réservation.</td></tr>'+
+ '</table></td></tr></table></body></html>';
  let send;
- try{send=await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Authorization':'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[admin],subject:'[TaxiDirect 78] Nouvelle demande '+ref+' — À CONFIRMER',text:plain})});}
+ try{send=await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Authorization':'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[admin],subject:'TaxiDirect 78 · Nouvelle demande à confirmer · '+ref,text:plain,html})});}
  catch{return reply(502,'Le service de notification ne répond pas. Merci de nous contacter par téléphone.');}
  if(!send.ok)return reply(502,'Notification indisponible. Merci de nous contacter par téléphone.');
  return reply(202,'Demande transmise à TaxiDirect. En attente de confirmation.',{reference:ref,status:'pending'});
