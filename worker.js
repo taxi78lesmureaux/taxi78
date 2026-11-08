@@ -409,6 +409,42 @@ h1,h2,h3{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
  .hero-new-actions .btn{width:100%}
 }
 
+
+/* THEME 78 / editorial signature — 3 core hues + white */
+:root{--navy:#0B1F33;--navy2:#164354;--ink:#0B1F33;--teal:#14B8A6;--gold:#E7B96A;--paper:#FFFFFF;--line:#D6E8E5;--muted:#526F7B}
+body{background:#FFFFFF}
+.service-overview,.medical-story,.faq-section{background:#FFFFFF}
+.experience-band,.how-section{background:#EDF8F6}
+.cpam-guide{background:#FCFAF5}
+.brand-icon-svg{width:29px;height:29px;display:block}
+.service-block{box-shadow:0 8px 22px #0B1F3309;border-radius:20px 20px 20px 4px}
+.service-special{background:linear-gradient(142deg,#0B1F33,#144657);border-color:#0B1F33}
+.service-special .service-emblem{background:#E7B96A;color:#0B1F33}
+.service-block:nth-child(2) .service-emblem{background:#E4F7F4;color:#137B75}
+.service-block:nth-child(3) .service-emblem{background:#EFF8F6;color:#137B75}
+.service-block:nth-child(4) .service-emblem{background:#FFF5E8;color:#A27937}
+.service-block .service-emblem{border-radius:16px 16px 16px 4px}
+.btn.primary{background:#E7B96A;color:#0B1F33;box-shadow:0 9px 20px #0B1F3320}
+.btn.primary:hover{background:#F3CE8B}
+.btn.darkbtn{background:#0B1F33;color:#FFFFFF}
+.btn.darkbtn:hover{background:#164354}
+.hero-highlight,.hero-premium .hero-eyebrow,.hero-bottom-info a,.zone-all,.route-symbol{color:#E7B96A}
+.hero-new-media,.service-block,.experience-media,.medical-photo{contain:layout}
+.hero-photo-edge{border-radius:5px}
+.hero-photo-edge img{filter:contrast(1.04) saturate(.92) brightness(.84)}
+.hero-font-outline{-webkit-text-stroke:1px #FFFFFF}
+.little-check{color:#E7B96A;border-color:#E7B96A80}
+.secondary-zone{display:block;font-size:12px!important;color:#AFC9CD!important;margin:4px 0 18px!important}
+.secondary-zone a{color:#E7B96A;font-weight:900;text-decoration:underline;text-underline-offset:3px}
+.route-78{color:#E7B96A;font-size:150px;line-height:1}
+.route-ribbon{color:#B8DED7}
+.medical-tags span{background:#E5F8F5;color:#0B6058}
+.faqitem[open]{background:linear-gradient(90deg,#EAF8F5,transparent)}
+.faqitem summary{padding-inline:8px;border-radius:9px}
+.faqitem summary:hover{background:#E5F8F5}
+.how-step:hover,.service-block:hover{border-color:#14B8A680}
+a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #14B8A6;outline-offset:3px}
+@media(max-width:650px){.route-78{font-size:100px}.service-block{min-height:290px}}
   `;
   const button=(href,label,type="primary")=>`<a class="btn ${type}" href="${href}">${label} <span aria-hidden="true">↗</span></a>`;
   const icon=(name)=>{const paths={
