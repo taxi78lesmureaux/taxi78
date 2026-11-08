@@ -16,8 +16,8 @@ async function handleBooking(request,env){
  if(!b.nom||b.nom.length<2||!/^[+0-9() .-]{8,30}$/.test(b.telephone)||b.depart.length<3||b.destination.length<3||!/^\d{4}-\d{2}-\d{2}$/.test(b.date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(b.heure))return reply(422,'Merci de vérifier vos coordonnées et votre trajet.');
  if(!['Taxi conventionné CPAM','Taxi classique','Van','Berline prestige'].includes(b.type))return reply(422,'Catégorie de véhicule invalide.');
  if(b.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email))return reply(422,'Adresse email invalide.');
- if(!env?.RESEND_API_KEY||!env?.BOOKING_FROM_EMAIL)return reply(503,'La notification email administrateur n’est pas encore activée.');
- const admin='taxidirect27@gmail.com';
+ if(!env?.RESEND_API_KEY||!env?.BOOKING_FROM_EMAIL||!env?.BOOKING_ADMIN_EMAIL)return reply(503,'La notification email administrateur n’est pas encore activée.');
+ const admin=env.BOOKING_ADMIN_EMAIL;
  const ref='TD78-'+Date.now().toString(36).toUpperCase()+'-'+crypto.randomUUID().slice(0,6).toUpperCase();
  const fields=[['Référence',ref],['Statut','EN ATTENTE DE CONFIRMATION'],['Nom',b.nom],['Téléphone',b.telephone],['Email',b.email||'Non communiqué'],['Véhicule demandé',b.type],['Départ',b.depart],['Destination',b.destination],['Date souhaitée',b.date],['Heure souhaitée',b.heure],['Aller-retour',b.retour?'Oui':'Non']];
  const plain=fields.map(([k,v])=>k+' : '+v).join('\n')+'\n\nACTION ADMIN : contacter le client pour confirmer ou refuser selon disponibilité. Aucune réservation n’est confirmée automatiquement.';
