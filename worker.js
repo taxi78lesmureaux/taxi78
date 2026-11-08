@@ -19,6 +19,11 @@ async function handleBooking(request,env){
  if(!env?.RESEND_API_KEY||!env?.BOOKING_FROM_EMAIL||!env?.BOOKING_ADMIN_EMAIL)return reply(503,'La notification email administrateur n’est pas encore activée.');
  const admin=env.BOOKING_ADMIN_EMAIL;
  const ref='TD78-'+Date.now().toString(36).toUpperCase()+'-'+crypto.randomUUID().slice(0,6).toUpperCase();
+ if(!env?.BOOKINGS_DB)return reply(503,'Le service de réservation est momentanément indisponible.');
+ const created=tdNow(),bookingId=crypto.randomUUID();
+ try{await env.BOOKINGS_DB.prepare('INSERT INTO bookings(id,reference,created_at,updated_at,customer_name,customer_phone,customer_email,from_address,to_address,travel_date,travel_time,vehicle,return_trip,status,notified) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)').bind(bookingId,ref,created,created,b.nom,b.telephone,b.email||null,b.depart,b.destination,b.date,b.heure,b.type,b.retour?1:0,'pending').run();}
+ catch{return reply(503,'Impossible d’enregistrer la demande. Merci de réessayer.');}
+
  const fields=[['Référence',ref],['Statut','EN ATTENTE DE CONFIRMATION'],['Nom',b.nom],['Téléphone',b.telephone],['Email',b.email||'Non communiqué'],['Véhicule demandé',b.type],['Départ',b.depart],['Destination',b.destination],['Date souhaitée',b.date],['Heure souhaitée',b.heure],['Aller-retour',b.retour?'Oui':'Non']];
  const plain=fields.map(([k,v])=>k+' : '+v).join('\n')+'\n\nACTION ADMIN : contacter le client pour confirmer ou refuser selon disponibilité. Aucune réservation n’est confirmée automatiquement.';
  // Escape every client-supplied value before interpolating into HTML.
@@ -71,9 +76,10 @@ async function handleBooking(request,env){
  '</table></td></tr></table></body></html>';
  let send;
  try{send=await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Authorization':'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[admin],subject:'TaxiDirect 78 · Nouvelle demande à confirmer · '+ref,text:plain,html})});}
- catch{return reply(502,'Le service de notification ne répond pas. Merci de nous contacter par téléphone.');}
- if(!send.ok)return reply(502,'Notification indisponible. Merci de nous contacter par téléphone.');
- return reply(202,'Demande transmise à TaxiDirect. En attente de confirmation.',{reference:ref,status:'pending'});
+ catch{return reply(202,'Demande enregistrée dans le tableau de bord. Notification email momentanément indisponible.',{reference:ref,status:'pending',emailSent:false});}
+ if(!send.ok)return reply(202,'Demande enregistrée dans le tableau de bord, mais notification email indisponible.',{reference:ref,status:'pending',emailSent:false});
+ await env.BOOKINGS_DB.prepare('UPDATE bookings SET notified=1 WHERE id=?').bind(bookingId).run();
+ return reply(202,'Demande transmise à TaxiDirect. En attente de confirmation.',{reference:ref,status:'pending',emailSent:true});
 }
 
 /* Private TaxiDirect dispatch API. All authenticated routes deny unauthenticated access. */
