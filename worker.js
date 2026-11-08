@@ -75,6 +75,119 @@ async function handleBooking(request,env){
  if(!send.ok)return reply(502,'Notification indisponible. Merci de nous contacter par téléphone.');
  return reply(202,'Demande transmise à TaxiDirect. En attente de confirmation.',{reference:ref,status:'pending'});
 }
+
+/* Private TaxiDirect dispatch API. All authenticated routes deny unauthenticated access. */
+const TDJSON={'content-type':'application/json;charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'};
+const tdReply=(code,obj,extra={})=>new Response(JSON.stringify(obj),{status:code,headers:{...TDJSON,...extra}});
+const tdHash=async(value)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+const tdClean=(v,max)=>typeof v==='string'?v.trim().slice(0,max):'';
+const tdEmail=(v)=>typeof v==='string'?v.trim().toLowerCase():'';
+const tdNow=()=>new Date().toISOString();
+const tdCookie=(r)=>{const m=(r.headers.get('Cookie')||'').match(/(?:^|;\s*)td78_session=([^;]+)/);return m?.[1]||''};
+const tdSameOrigin=(r)=>{try{return new URL(r.headers.get('Origin')||'').origin===new URL(r.url).origin}catch{return false}};
+async function tdInput(r){if(!/application\/json/i.test(r.headers.get('content-type')||''))throw Error('Format invalide');const str=await r.text();if(str.length>10000)throw Error('Requête trop volumineuse');const x=JSON.parse(str);if(!x||Array.isArray(x)||typeof x!=='object')throw Error('Données invalides');return x}
+async function tdIdentity(env,id){const identifier=tdEmail(id);if(!identifier||identifier.length>140)return null; if(identifier===tdEmail(env.BOOKING_ADMIN_EMAIL))return {identifier,email:tdEmail(env.BOOKING_ADMIN_EMAIL),role:'admin',driver_id:null,name:'Administrateur TaxiDirect'};const driver=await env.BOOKINGS_DB.prepare('SELECT id,display_name,email FROM drivers WHERE active=1 AND (lower(email)=? OR lower(id)=?)').bind(identifier,identifier).first();return driver?{identifier,email:driver.email.toLowerCase(),role:'driver',driver_id:driver.id,name:driver.display_name}:null}
+async function tdSession(r,env){const token=tdCookie(r);if(!/^[a-f0-9]{64}$/.test(token))return null;const hash=await tdHash(token);const row=await env.BOOKINGS_DB.prepare('SELECT * FROM sessions WHERE token_hash=? AND expires_at>?').bind(hash,Date.now()).first();if(!row)return null;if(row.role==='admin'){if(tdEmail(row.identity)!==tdEmail(env.BOOKING_ADMIN_EMAIL))return null;return {role:'admin',email:row.identity,name:'Administrateur TaxiDirect',driver_id:null}}const drv=await env.BOOKINGS_DB.prepare('SELECT id,display_name,email FROM drivers WHERE id=? AND active=1 AND lower(email)=?').bind(row.driver_id,tdEmail(row.identity)).first();return drv?{role:'driver',email:drv.email,name:drv.display_name,driver_id:drv.id}:null}
+const tdAudit=async(db,booking,actor,action,details)=>db.prepare('INSERT INTO audit_log(id,booking_id,actor,action,details,created_at) VALUES(?,?,?,?,?,?)').bind(crypto.randomUUID(),booking,actor,action,details,tdNow()).run();
+async function tdAuthApi(request,env,path){
+ if(!env?.BOOKINGS_DB)return tdReply(503,{error:'Service de gestion indisponible'});
+ const method=request.method;
+ if(path==='/api/auth/me'){const actor=await tdSession(request,env);return actor?tdReply(200,{user:actor}):tdReply(401,{error:'Connexion nécessaire'})}
+ if(path==='/api/auth/start'&&method==='POST'){
+  if(!tdSameOrigin(request))return tdReply(403,{error:'Origine non autorisée'});
+  let input;try{input=await tdInput(request)}catch{return tdReply(400,{error:'Données incorrectes'})}
+  const key=tdEmail(input.identifier);const identity=await tdIdentity(env,key);
+  const generic={message:'Si cet identifiant est autorisé, un code de connexion a été envoyé.'};
+  if(!identity||!env.RESEND_API_KEY||!env.BOOKING_FROM_EMAIL)return tdReply(200,generic);
+  const previous=await env.BOOKINGS_DB.prepare('SELECT last_sent_at FROM login_codes WHERE identifier=?').bind(key).first();
+  if(previous&&Date.now()-previous.last_sent_at<90000)return tdReply(200,generic);
+  const bytes=new Uint32Array(1);crypto.getRandomValues(bytes);const code=String(bytes[0]%1000000).padStart(6,'0');
+  const salt=crypto.randomUUID();const digest=await tdHash(salt+':'+code);
+  const mailed=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:env.BOOKING_FROM_EMAIL,to:[identity.email],subject:'TaxiDirect 78 · Votre code de connexion',text:'Votre code de connexion TaxiDirect 78 : '+code+'\n\nValable 10 minutes. Ne communiquez ce code à personne. Si vous n’avez pas demandé cette connexion, ignorez cet email.',html:'<div style="font-family:Arial,sans-serif;max-width:420px;margin:auto;padding:25px;background:#f4f8fa"><div style="background:#06364e;color:white;padding:22px;border-radius:12px 12px 0 0;font-size:24px;font-weight:bold">Taxi<span style="color:#60dcd3">Direct</span> <span style="color:#f4c44b">78</span></div><div style="padding:25px;background:white"><h2 style="color:#133b4b">Code de connexion</h2><p>Voici votre code à usage unique :</p><div style="font-weight:900;letter-spacing:6px;font-size:34px;color:#087c82;text-align:center;padding:17px;background:#eef8f7;border-radius:10px">'+code+'</div><p style="color:#526571;font-size:13px">Valable 10 minutes. Ne partagez jamais ce code.</p></div></div>'})});
+  if(mailed.ok)await env.BOOKINGS_DB.prepare('INSERT INTO login_codes(identifier,code_hash,expires_at,last_sent_at,attempts) VALUES(?,?,?,?,0) ON CONFLICT(identifier) DO UPDATE SET code_hash=excluded.code_hash,expires_at=excluded.expires_at,last_sent_at=excluded.last_sent_at,attempts=0').bind(key,salt+':'+digest,Date.now()+600000,Date.now()).run();
+  return tdReply(200,generic);
+ }
+ if(path==='/api/auth/verify'&&method==='POST'){
+  if(!tdSameOrigin(request))return tdReply(403,{error:'Origine non autorisée'});
+  let data;try{data=await tdInput(request)}catch{return tdReply(400,{error:'Données incorrectes'})}
+  const key=tdEmail(data.identifier),otp=tdClean(data.code,10);if(!/^\d{6}$/.test(otp))return tdReply(422,{error:'Code à six chiffres requis'});
+  const row=await env.BOOKINGS_DB.prepare('SELECT * FROM login_codes WHERE identifier=?').bind(key).first();
+  if(!row||row.expires_at<Date.now()||row.attempts>=5)return tdReply(401,{error:'Code expiré ou incorrect'});
+  await env.BOOKINGS_DB.prepare('UPDATE login_codes SET attempts=attempts+1 WHERE identifier=?').bind(key).run();
+  const [salt,digest]=row.code_hash.split(':');if((await tdHash(salt+':'+otp))!==digest)return tdReply(401,{error:'Code expiré ou incorrect'});
+  const actor=await tdIdentity(env,key);if(!actor)return tdReply(403,{error:'Compte non autorisé'});
+  await env.BOOKINGS_DB.prepare('DELETE FROM login_codes WHERE identifier=?').bind(key).run();
+  const buf=crypto.getRandomValues(new Uint8Array(32));const token=Array.from(buf).map(v=>v.toString(16).padStart(2,'0')).join('');
+  await env.BOOKINGS_DB.prepare('INSERT INTO sessions(token_hash,identity,role,driver_id,expires_at,created_at) VALUES(?,?,?,?,?,?)').bind(await tdHash(token),actor.email,actor.role,actor.driver_id,Date.now()+604800000,tdNow()).run();
+  return tdReply(200,{user:actor},{'set-cookie':'td78_session='+token+'; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=604800'});
+ }
+ if(path==='/api/auth/logout'&&method==='POST'){
+  if(!tdSameOrigin(request))return tdReply(403,{error:'Origine non autorisée'});
+  const token=tdCookie(request);if(token)await env.BOOKINGS_DB.prepare('DELETE FROM sessions WHERE token_hash=?').bind(await tdHash(token)).run();
+  return tdReply(200,{ok:true},{'set-cookie':'td78_session=; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=0'});
+ }
+ return tdReply(404,{error:'Introuvable'});
+}
+async function tdDispatchApi(request,env,path){
+ if(!env?.BOOKINGS_DB)return tdReply(503,{error:'Base de données indisponible'});
+ const actor=await tdSession(request,env);if(!actor)return tdReply(401,{error:'Connexion nécessaire'});
+ if(request.method!=='GET'&&!tdSameOrigin(request))return tdReply(403,{error:'Origine non autorisée'});
+ const db=env.BOOKINGS_DB;
+ if(path==='/api/dispatch/overview'&&request.method==='GET'){
+  const [stats,bookings,drivers]=await Promise.all([
+   db.prepare("SELECT status,COUNT(*) AS total FROM bookings GROUP BY status").all(),
+   actor.role==='admin'?db.prepare('SELECT b.*,d.display_name AS driver_name FROM bookings b LEFT JOIN drivers d ON d.id=b.driver_id ORDER BY b.created_at DESC LIMIT 150').all():db.prepare('SELECT b.*,d.display_name AS driver_name FROM bookings b LEFT JOIN drivers d ON d.id=b.driver_id WHERE b.driver_id=? AND b.status IN (\'confirmed\',\'on_route\',\'completed\') ORDER BY b.travel_date ASC,b.travel_time ASC LIMIT 100').bind(actor.driver_id).all(),
+   actor.role==='admin'?db.prepare('SELECT id,display_name,email,phone,active,created_at FROM drivers ORDER BY created_at DESC').all():Promise.resolve({results:[]})
+  ]);
+  const safe=(bookings.results||[]).map(x=>({...x,notes:actor.role==='admin'?x.notes:null}));
+  return tdReply(200,{user:actor,stats:actor.role==='admin'?(stats.results||[]):[],bookings:safe,drivers:drivers.results||[]});
+ }
+ if(path==='/api/dispatch/drivers'&&request.method==='POST'&&actor.role==='admin'){
+  let x;try{x=await tdInput(request)}catch{return tdReply(400,{error:'Données invalides'})}
+  const name=tdClean(x.name,85),email=tdEmail(x.email),phone=tdClean(x.phone,30);
+  if(name.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^([+0-9() .-]{8,30})?$/.test(phone))return tdReply(422,{error:'Vérifiez nom, email et téléphone'});
+  const driverId='TD-CH-'+crypto.randomUUID().slice(0,8).toUpperCase();
+  try{await db.prepare('INSERT INTO drivers(id,display_name,email,phone,active,created_at) VALUES(?,?,?,?,1,?)').bind(driverId,name,email,phone,tdNow()).run();}catch{return tdReply(409,{error:'Un chauffeur utilise déjà cette adresse email'})}
+  await tdAudit(db,null,actor.email,'driver_created',driverId);
+  return tdReply(201,{ok:true,id:driverId});
+ }
+ const drvPath=path.match(/^\/api\/dispatch\/drivers\/(TD-CH-[A-F0-9]{8})$/);
+ if(drvPath&&request.method==='PATCH'&&actor.role==='admin'){
+  let x;try{x=await tdInput(request)}catch{return tdReply(400,{error:'Données incorrectes'})}
+  const active=x.active===true?1:x.active===false?0:null;if(active===null)return tdReply(422,{error:'Statut invalide'});
+  const z=await db.prepare('UPDATE drivers SET active=? WHERE id=?').bind(active,drvPath[1]).run();if(!z.meta?.changes)return tdReply(404,{error:'Chauffeur introuvable'});
+  if(!active)await db.prepare('DELETE FROM sessions WHERE driver_id=?').bind(drvPath[1]).run();
+  await tdAudit(db,null,actor.email,'driver_access_changed',drvPath[1]+':'+active);return tdReply(200,{ok:true});
+ }
+ const match=path.match(/^\/api\/dispatch\/bookings\/(TD78-[A-Z0-9-]+)$/);
+ if(match&&request.method==='PATCH'){
+  let x;try{x=await tdInput(request)}catch{return tdReply(400,{error:'Données incorrectes'})}
+  const booking=await db.prepare('SELECT * FROM bookings WHERE reference=?').bind(match[1]).first();if(!booking)return tdReply(404,{error:'Réservation introuvable'});
+  if(actor.role==='driver'){
+   if(booking.driver_id!==actor.driver_id)return tdReply(403,{error:'Course non attribuée'});
+   const next=tdClean(x.status,24),allowed={confirmed:['on_route'],on_route:['completed']};
+   if(!(allowed[booking.status]||[]).includes(next))return tdReply(409,{error:'Transition non autorisée'});
+   const updated=await db.prepare('UPDATE bookings SET status=?,updated_at=? WHERE reference=? AND status=? AND driver_id=?').bind(next,tdNow(),booking.reference,booking.status,actor.driver_id).run();
+   if(!updated.meta?.changes)return tdReply(409,{error:'Statut modifié entre-temps'});
+   await tdAudit(db,booking.id,actor.email,'status',booking.status+' -> '+next);return tdReply(200,{ok:true,status:next});
+  }
+  const status=tdClean(x.status,24),assign=tdClean(x.driver_id,20),notes=tdClean(x.notes,450);
+  if(x.action==='assign'){
+   if(!['pending','confirmed'].includes(booking.status))return tdReply(409,{error:'Course non attribuable'});
+   if(assign){const drv=await db.prepare('SELECT id FROM drivers WHERE id=? AND active=1').bind(assign).first();if(!drv)return tdReply(422,{error:'Chauffeur indisponible'})}
+   await db.prepare('UPDATE bookings SET driver_id=?,updated_at=? WHERE reference=?').bind(assign||null,tdNow(),booking.reference).run();
+   await tdAudit(db,booking.id,actor.email,'assigned',assign||'unassigned');return tdReply(200,{ok:true});
+  }
+  if(x.action==='notes'){await db.prepare('UPDATE bookings SET notes=?,updated_at=? WHERE reference=?').bind(notes,tdNow(),booking.reference).run();await tdAudit(db,booking.id,actor.email,'notes_updated','Notes internes');return tdReply(200,{ok:true})}
+  const allowed={pending:['confirmed','rejected'],confirmed:['cancelled','on_route'],on_route:['completed','cancelled']};
+  if(!(allowed[booking.status]||[]).includes(status))return tdReply(409,{error:'Transition non autorisée'});
+  const updated=await db.prepare('UPDATE bookings SET status=?,updated_at=?,decision_at=?,decision_by=? WHERE reference=? AND status=?').bind(status,tdNow(),tdNow(),actor.email,booking.reference,booking.status).run();
+  if(!updated.meta?.changes)return tdReply(409,{error:'Statut modifié entre-temps'});
+  await tdAudit(db,booking.id,actor.email,'status',booking.status+' -> '+status);
+  return tdReply(200,{ok:true,status,clientNotified:false});
+ }
+ return tdReply(404,{error:'Action inconnue ou non autorisée'});
+}
 const site=(function makeSite() {
   const name="TaxiDirect", tel="06 19 95 97 34", phone="tel:+33619959734", tel2="06 01 22 58 22", phone2="tel:+33601225822", whatsapp="https://wa.me/33601225822?text=Bonjour%20TaxiDirect%2C%20je%20souhaite%20organiser%20un%20trajet.", email="taxidirect27@gmail.com", official="https://www.taxidirect78conventionne.fr";
   const ameli="https://www.ameli.fr/assure/remboursements/rembourse/frais-transport";
@@ -731,6 +844,8 @@ finally{button.disabled=false;button.textContent=label;}
   return {pages,render,async fetch(request,env){
     const u=new URL(request.url),pathname=u.pathname,preview=u.hostname.endsWith(".pages.dev")||u.hostname.endsWith(".workers.dev");
     if(pathname==="/api/reservations")return handleBooking(request,env);
+    if(pathname.startsWith('/api/auth/'))return tdAuthApi(request,env,pathname);
+    if(pathname.startsWith('/api/dispatch/'))return tdDispatchApi(request,env,pathname);
     if(request.method!=="GET"&&request.method!=="HEAD")return new Response("Method not allowed",{status:405,headers:{allow:"GET, HEAD"}});
     if(pathname==="/robots.txt")return new Response(preview?"User-agent: *\nDisallow: /\n":"User-agent: *\nAllow: /\nSitemap: "+official+"/sitemap.xml\n",{headers:{"content-type":"text/plain;charset=utf-8"}});
     if(pathname==="/sitemap.xml")return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+pages.filter(p=>!p[0].includes("mentions")&&!p[0].includes("confidentialite")).map(p=>`<url><loc>${official+p[0]}</loc><lastmod>2026-11-08</lastmod></url>`).join("")+'</urlset>',{headers:{"content-type":"application/xml;charset=utf-8","x-robots-tag":preview?"noindex":"index"}});
