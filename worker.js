@@ -794,7 +794,7 @@ return '<section class="td78-photo-showcase" aria-label="Taxi conventionné CPAM
 +'<div class="td78-mobile-hero-bg" role="img" aria-label="Mercedes TaxiDirect 78 avec lumineux moderne"></div>'
 +'<div class="td78-mobile-copy"><span>TRANSPORTS MÉDICAUX • LES YVELINES</span><h2>Taxi conventionné <em>CPAM</em><br>dans les Yvelines (78)</h2>'
 +'<ul><li>Transports médicaux sur prescription</li><li>Transferts hôpitaux et cliniques</li><li>Toutes distances – 7j/7 et 24h/24</li></ul><a href="#reservation-rapide">Réserver un trajet →</a></div></div>'
-+'<div class="td78-mobile-fleet">'+td78CpamCard()+cards.map(c=>'<a href="#reservation-rapide" class="td78-mobile-card" data-td78-type="'+c[1]+'" aria-label="Réserver : '+c[0]+'"><span class="td78-mobile-art td78-mobile-art-'+c[2]+'" aria-hidden="true"></span></a>').join("")+'</div>'
++'<div class="td78-mobile-fleet">'+td78CpamCard()+cards.map(c=>'<a href="#reservation-rapide" class="td78-mobile-card td78-mobile-card-live" data-td78-type="'+c[1]+'" aria-label="Réserver : '+c[0]+'"><span class="td78-mobile-vehicle-heading"><strong>'+(c[2]==='van'?'Van / Minibus':c[0])+'</strong><small>'+(c[2]==='taxi'?'1 à 4 passagers':c[2]==='van'?'5 à 8 passagers':'Confort et élégance')+'</small></span><span class="td78-mobile-art td78-mobile-art-'+c[2]+'" aria-hidden="true"></span><span class="td78-mobile-vehicle-cta">▦ '+(c[2]==='taxi'?'Réserver un taxi':c[2]==='van'?'Réserver un van':'Réserver une berline')+' <b aria-hidden="true">›</b></span></a>').join("")+'</div>'
 +'<div class="td78-mobile-benefits"><span>✚ Transport médical CPAM</span><span>◷ 7j/7 – 24h/24</span><span>● Yvelines et Île-de-France</span><span>✓ Chauffeurs professionnels</span></div></div>'
 +'<div class="td78-photo-action"><div><strong>Votre partenaire transport médical dans les Yvelines (78)</strong><span>Patients • établissements de santé • professionnels</span></div><a href="#reservation-rapide">▦ Réserver maintenant <b aria-hidden="true">›</b></a></div></section>';
 }
@@ -1216,12 +1216,59 @@ const td78FinalLogoCSS = "\n/* Final approved header logo only, Nov 11 */\n.f-he
  .td78-desktop-vehicle-heading strong{font-size:11px}
 }
 `;
+  const td78VehicleRenderFixCSS=String.raw`
+/* Correction des images et des liens des trois véhicules; CPAM inchangé. */
+@media(max-width:780px){
+ .td78-mobile-fleet .td78-mobile-card-live{
+  display:flex!important;flex-direction:column!important;gap:0!important;
+  background:#fff!important;border:1px solid var(--brand-line,#d9e3ec)!important;
+  border-radius:16px!important;overflow:hidden!important;text-decoration:none!important;
+  box-shadow:0 5px 15px rgba(41,52,66,.11)!important;color:#293442!important;
+ }
+ .td78-mobile-card-live .td78-mobile-vehicle-heading{
+  display:flex!important;align-items:center;justify-content:space-between;gap:8px;
+  padding:12px 15px 5px;background:#fff;color:#293442;min-height:39px;
+ }
+ .td78-mobile-card-live .td78-mobile-vehicle-heading strong{font-weight:850;font-size:16px;line-height:1.2}
+ .td78-mobile-card-live .td78-mobile-vehicle-heading small{font-size:11px;color:#64748b;white-space:nowrap}
+ .td78-mobile-card-live .td78-mobile-art{
+  box-sizing:border-box;display:block!important;position:relative!important;width:100%!important;
+  height:auto!important;min-height:0!important;aspect-ratio:280/136!important;
+  background-image:url('/td78-fleet-cars-20261111.webp')!important;
+  background-repeat:no-repeat!important;background-size:300% 100%!important;
+  background-color:#fff!important;flex:none!important;
+ }
+ .td78-mobile-card-live .td78-mobile-art-taxi{background-position:0% 50%!important}
+ .td78-mobile-card-live .td78-mobile-art-van{background-position:50% 50%!important}
+ .td78-mobile-card-live .td78-mobile-art-prestige{background-position:100% 50%!important}
+ .td78-mobile-card-live .td78-mobile-art::before,.td78-mobile-card-live .td78-mobile-art::after{
+  content:none!important;display:none!important
+ }
+ .td78-mobile-card-live .td78-mobile-vehicle-cta{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:0 12px 12px;min-height:40px;padding:7px 12px;border-radius:100px;
+  font-size:14px;font-weight:850;color:#fff;background:#0053B4;text-align:center;white-space:nowrap
+ }
+ .td78-mobile-card-live:hover .td78-mobile-vehicle-cta{background:#003f92}
+ .td78-mobile-card-live:focus-visible{outline:3px solid #FFC400;outline-offset:2px}
+}
+@media(min-width:781px){
+ .td78-desktop-vehicle-visual .td78-mobile-art{
+  background-image:url('/td78-fleet-cars-20261111.webp')!important;
+  background-repeat:no-repeat!important;background-size:300% 100%!important;
+  aspect-ratio:280/136!important;
+ }
+ .td78-desktop-vehicle-visual .td78-mobile-art-taxi{background-position:0% 50%!important}
+ .td78-desktop-vehicle-visual .td78-mobile-art-van{background-position:50% 50%!important}
+ .td78-desktop-vehicle-visual .td78-mobile-art-prestige{background-position:100% 50%!important}
+}
+`;
     const td78BookLinkJS="\n<script id=\"td78-card-booking-link\">document.addEventListener('click',function(e){const a=e.target.closest('[data-td78-type]');if(!a)return;const val=a.getAttribute('data-td78-type');const input=document.querySelector('#f-booking input[name=\"type\"][value=\"'+val+'\"]');if(input){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}})</script>";
   const topInfoBarCSS="\n/* TD78_RESPONSIVE_INFO_TOPBAR_20261109 — four information points like approved screenshot */\n.td-info-bar{position:relative;isolation:isolate;z-index:81;display:block;width:100%;background:linear-gradient(100deg,#004f61 0%,#006674 48%,#007981 100%);color:#fff;border-bottom:1px solid rgba(104,242,231,.6);box-shadow:inset 0 -1px rgba(0,35,47,.25)}\n.td-info-inner{width:min(100%,1720px);min-height:42px;margin-inline:auto;padding:0 21px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.7fr) minmax(0,1.05fr) minmax(0,1.44fr);align-items:stretch}\n.td-info-item{display:flex;gap:9px;align-items:center;justify-content:center;padding:9px 12px;min-width:0;font-size:clamp(11px,.87vw,15px);font-weight:750;letter-spacing:-.015em;line-height:1.2;text-align:left}\n.td-info-item+.td-info-item{border-left:1px solid rgba(242,255,255,.64)}\n.td-info-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}\n.td-info-icon svg{width:100%;height:100%;display:block}\n.td-info-label{min-width:0;overflow-wrap:normal}\n@media(min-width:1101px) and (max-width:1380px){.td-info-inner{padding-inline:12px}.td-info-item{padding-inline:8px;font-size:11.5px;gap:6px}.td-info-icon{width:18px;height:18px}}\n@media(max-width:1100px){\n .td-info-inner{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);padding:3px 16px}\n .td-info-item{justify-content:flex-start;padding:6px 13px;font-size:12px;gap:8px;line-height:1.25}\n .td-info-item+.td-info-item{border-left:0}\n .td-info-item:nth-child(even){border-left:1px solid rgba(242,255,255,.45)}\n .td-info-item:nth-child(n+3){border-top:1px solid rgba(242,255,255,.2)}\n .td-info-icon{width:18px;height:18px}\n}\n@media(max-width:560px){\n .td-info-inner{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);padding:2px 8px}\n .td-info-item{align-items:flex-start;padding:7px 5px;gap:5px;font-size:10.3px;line-height:1.28;letter-spacing:-.01em}\n .td-info-icon{width:15px;height:15px;margin-top:1px}\n .td-info-label{hyphens:auto}\n}\n@media(max-width:360px){.td-info-item{font-size:9.6px;gap:4px}.td-info-icon{width:14px;height:14px}}\n";
   function render(path,host){
     const p=pages.find(x=>x[0]===path), preview=host.endsWith(".pages.dev")||host.endsWith(".workers.dev")||host==="localhost", found=!!p;
     const title=found?p[1]:"Page introuvable | TaxiDirect",desc=found?p[2]:"Page indisponible",canonical=official+path;
-    return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0053B4"><meta name="robots" content="${preview||!found?"noindex,nofollow":"index,follow,max-image-preview:large"}"><title>${title}</title><meta name="description" content="${desc}">${!preview&&found?`<link rel="canonical" href="${canonical}">`:""}<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${preview?"https://"+host+path:canonical}"><meta property="og:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><meta property="og:image:alt" content="Taxi conventionné TaxiDirect au crépuscule"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${desc}"><meta name="twitter:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="preconnect" href="https://www.taxidirect78conventionne.fr" crossorigin>${path==="/"?`<link rel="preload" as="image" href="/td78-approved-art-v3.png" fetchpriority="high">`:""}<style>${css}${futuristicCSS}${noFaceCSS}${fidelityCSS}${extraMatchCSS}${layoutFixCSS}${noBlankCSS}${brandRepairCSS}${contactRedesignCSS}${bookingConsistencyCSS}${trustBarCSS}${formBackendCSS}${activeMenuCSS}${touchMenuCSS}${crispBrandCSS}${footerLogoSizingCSS}${footerV2CSS}${desktopTabletMenuCSS}${contactAndVehiclePolishCSS}${bookingPageChoiceCSS}${mobileHeaderAlignmentCSS}${desktopHeroTitleCSS}${cookieCSS}${desktopMenuHoverCSS}${topInfoBarCSS}${td78VisualCSS}${headerLogoFitCSS}${svgHeaderCSS}${td78FinalLogoCSS}${approvedLogoThemeCSS}${td78PaletteFinishingCSS}${td78ConventionCSS}${td78MondeoFirstCSS}${td78DesktopFourCSS}${td78FullFleetFixCSS}${td78FleetIsolatedCSS}</style>${!preview&&found?`<script type="application/ld+json">${graph(p,canonical)}</script>`:""}</head><body>${header(path)}<main id="main">${bodyFor(path)}</main>${footer()}${attachHeaderControls()}${desktopMenuHoverJS()}${cookieConsentUi()}${path==="/"?td78BookLinkJS:""}</body></html>`;
+    return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0053B4"><meta name="robots" content="${preview||!found?"noindex,nofollow":"index,follow,max-image-preview:large"}"><title>${title}</title><meta name="description" content="${desc}">${!preview&&found?`<link rel="canonical" href="${canonical}">`:""}<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${preview?"https://"+host+path:canonical}"><meta property="og:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><meta property="og:image:alt" content="Taxi conventionné TaxiDirect au crépuscule"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${desc}"><meta name="twitter:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="preconnect" href="https://www.taxidirect78conventionne.fr" crossorigin>${path==="/"?`<link rel="preload" as="image" href="/td78-approved-art-v3.png" fetchpriority="high">`:""}<style>${css}${futuristicCSS}${noFaceCSS}${fidelityCSS}${extraMatchCSS}${layoutFixCSS}${noBlankCSS}${brandRepairCSS}${contactRedesignCSS}${bookingConsistencyCSS}${trustBarCSS}${formBackendCSS}${activeMenuCSS}${touchMenuCSS}${crispBrandCSS}${footerLogoSizingCSS}${footerV2CSS}${desktopTabletMenuCSS}${contactAndVehiclePolishCSS}${bookingPageChoiceCSS}${mobileHeaderAlignmentCSS}${desktopHeroTitleCSS}${cookieCSS}${desktopMenuHoverCSS}${topInfoBarCSS}${td78VisualCSS}${headerLogoFitCSS}${svgHeaderCSS}${td78FinalLogoCSS}${approvedLogoThemeCSS}${td78PaletteFinishingCSS}${td78ConventionCSS}${td78MondeoFirstCSS}${td78DesktopFourCSS}${td78FullFleetFixCSS}${td78FleetIsolatedCSS}${td78VehicleRenderFixCSS}</style>${!preview&&found?`<script type="application/ld+json">${graph(p,canonical)}</script>`:""}</head><body>${header(path)}<main id="main">${bodyFor(path)}</main>${footer()}${attachHeaderControls()}${desktopMenuHoverJS()}${cookieConsentUi()}${path==="/"?td78BookLinkJS:""}</body></html>`;
   }
   const favicon=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#293442"/><path d="M8 16h26v8h-9v29h-9V24H8z" fill="#FFC400"/><path d="M33 16h8c12 0 17 8 17 18s-5 19-17 19h-8V16zm9 9v19c5-1 7-4 7-10s-2-8-7-9" fill="#0053B4"/><path d="M8 56c13-8 29-8 46 0" stroke="#FFC400" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
   return {pages,render,async fetch(request,env){
