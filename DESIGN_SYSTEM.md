@@ -5,15 +5,18 @@ La marque affichée est **TaxiDirect 78**. Le logo horizontal validé comprend :
 
 Le site utilise l'image validée, optimisée en **AVIF 420 × 140, 5 519 octets**, servie directement par Cloudflare à l'adresse `/brand-logo.avif`. Le fichier original existe dans les ressources de cette conversation. Le favicon SVG est une réduction stylistique TD.
 
-## Palette officielle : trois couleurs + blanc
+## Palette officielle — actualisée le 11 novembre 2026
+Le logo final validé est la référence. **Une seule teinte de bleu** sur le site, associée au jaune taxi, au gris neutre et au blanc.
+
 | Usage | Nom | Hex |
 |---|---|---|
-| Structure, menu, titres | Bleu nuit | `#0B1F33` |
-| Pictogrammes, étapes, éléments actifs | Turquoise | `#14B8A6` |
-| Réservation principale, signature du logo | Doré | `#E7B96A` |
-| Fond principal, contraste | Blanc | `#FFFFFF` |
+| Navigation, liens, sélections, bandeaux, actions secondaires | Bleu royal | `#0053B4` |
+| Réservation et éléments clés, détails taxi, focus | Jaune taxi | `#FFC400` |
+| Titres, textes, zones profondes (pas de bleu marine) | Gris anthracite | `#293442` |
+| Fond général et header | Blanc | `#FFFFFF` |
+| Surfaces discrètes et séparateurs, dérivés neutres | Blanc bleuté / gris clair | `#F3F7FC`, `#DEE6F0` |
 
-Les variations de luminosité dérivent de ces couleurs ; ne pas introduire d'autre couleur de marque. Éviter les dégradés multicolores, le bleu électrique et les boutons criards. Le doré est réservé aux accents, appels à l'action et zones importantes.
+Exception fonctionnelle : la marque **WhatsApp garde son vert officiel** pour rester identifiable. Les états hover, menus PC, tablette et mobile, réservations, pied de page et contrôle cookies doivent respecter cette palette. Le CSS de thème est ajouté après les règles historiques pour éviter de modifier la mise en page, le centrage du logo et les composants fonctionnels.
 
 ## Structure et UX
 - Entête avec logo approuvé, navigation concise et téléphones du groupement.
