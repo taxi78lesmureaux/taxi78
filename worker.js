@@ -1071,7 +1071,9 @@ const td78FinalLogoCSS = "\n/* Final approved header logo only, Nov 11 */\n.f-he
  .td78-desktop-vehicle-card{display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;text-decoration:none;background:#fff!important;color:var(--brand-ink)!important;border:1px solid var(--brand-line)!important;border-radius:17px!important;box-shadow:0 5px 15px rgba(41,52,66,.11)}
  .td78-desktop-vehicle-card:hover,.td78-desktop-fleet .td78-mondeo-card:hover{transform:translateY(-3px);box-shadow:0 10px 23px rgba(41,52,66,.17)!important}
  .td78-desktop-vehicle-visual{width:100%;position:relative;display:block;overflow:hidden;aspect-ratio:520/143;flex:none}
- .td78-desktop-vehicle-visual .td78-mobile-art{display:block;position:relative;width:100%;height:auto!important;aspect-ratio:520/190;max-width:none;background-repeat:no-repeat}
+ .td78-desktop-vehicle-visual .td78-mobile-art{display:block;position:relative;width:100%;height:auto!important;aspect-ratio:520/190;max-width:none;background-image:url('/td78-approved-art-v3.png')!important;background-repeat:no-repeat;background-size:321.54% auto;background-position:3.47% 69%}
+ .td78-desktop-vehicle-visual .td78-mobile-art-van{background-size:331.7% auto;background-position:49.19% 69%}
+ .td78-desktop-vehicle-visual .td78-mobile-art-prestige{background-size:318.5% auto;background-position:95.2% 69%}
  .td78-desktop-vehicle-visual .td78-mobile-art::before,.td78-desktop-vehicle-visual .td78-mobile-art::after{display:none!important}
  .td78-desktop-vehicle-cta{box-sizing:border-box;min-width:0;width:calc(100% - 16px);min-height:clamp(38px,4.2vw,56px);margin:auto 8px 8px;padding:7px 5px;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--brand-blue)!important;color:#fff!important;border:0;border-radius:100px;font-weight:850;font-size:clamp(11px,1.25vw,17px);line-height:1.15;text-align:center;white-space:nowrap;box-shadow:0 3px 7px rgba(0,83,180,.15)}
  .td78-desktop-vehicle-cta b{font-size:1.35em}
