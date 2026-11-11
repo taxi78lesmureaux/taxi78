@@ -1109,6 +1109,45 @@ const td78FinalLogoCSS = "\n/* Final approved header logo only, Nov 11 */\n.f-he
  .td78-desktop-fleet .td78-mondeo-card .td78-mondeo-photo{background-position:center center!important;background-size:contain!important}
  .td78-desktop-fleet .td78-mondeo-card .td78-cpam-seal{right:39%;max-width:42px}
 }
+/* TD78_ALIGN_4_VEHICLES_20261111 — supprimer les filets intégrés à la planche photo et
+   aligner les titres, les carrosseries et les CTA avec la carte Taxi conventionné.
+   Uniquement desktop/tablette : ne pas toucher aux cartes mobiles ni à la bannière. */
+@media (min-width:781px){
+ .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual{
+   flex:1 1 auto!important;
+   height:auto!important;
+   min-height:0!important;
+   aspect-ratio:auto!important;
+   overflow:hidden!important;
+   background:#fff!important;
+ }
+ .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art{
+   width:100%!important;
+   height:100%!important;
+   aspect-ratio:auto!important;
+   background-position:3.47% 55%!important;
+ }
+ .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art-van{
+   background-position:49.19% 55%!important;
+ }
+ .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art-prestige{
+   background-position:95.2% 55%!important;
+ }
+ /* Les trois traits vert/jaune/vert sont imprimés dans l'ancienne illustration.
+    La nouvelle fenêtre les recadre; ce cache blanc efface tout résidu en bas. */
+ .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual::after{
+   content:"";
+   position:absolute;
+   left:0;
+   right:0;
+   bottom:0;
+   height:clamp(5px,.6vw,10px);
+   background:#fff;
+   pointer-events:none;
+   z-index:2;
+ }
+}
+
 `;
     const td78BookLinkJS="\n<script id=\"td78-card-booking-link\">document.addEventListener('click',function(e){const a=e.target.closest('[data-td78-type]');if(!a)return;const val=a.getAttribute('data-td78-type');const input=document.querySelector('#f-booking input[name=\"type\"][value=\"'+val+'\"]');if(input){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}})</script>";
   const topInfoBarCSS="\n/* TD78_RESPONSIVE_INFO_TOPBAR_20261109 — four information points like approved screenshot */\n.td-info-bar{position:relative;isolation:isolate;z-index:81;display:block;width:100%;background:linear-gradient(100deg,#004f61 0%,#006674 48%,#007981 100%);color:#fff;border-bottom:1px solid rgba(104,242,231,.6);box-shadow:inset 0 -1px rgba(0,35,47,.25)}\n.td-info-inner{width:min(100%,1720px);min-height:42px;margin-inline:auto;padding:0 21px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.7fr) minmax(0,1.05fr) minmax(0,1.44fr);align-items:stretch}\n.td-info-item{display:flex;gap:9px;align-items:center;justify-content:center;padding:9px 12px;min-width:0;font-size:clamp(11px,.87vw,15px);font-weight:750;letter-spacing:-.015em;line-height:1.2;text-align:left}\n.td-info-item+.td-info-item{border-left:1px solid rgba(242,255,255,.64)}\n.td-info-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}\n.td-info-icon svg{width:100%;height:100%;display:block}\n.td-info-label{min-width:0;overflow-wrap:normal}\n@media(min-width:1101px) and (max-width:1380px){.td-info-inner{padding-inline:12px}.td-info-item{padding-inline:8px;font-size:11.5px;gap:6px}.td-info-icon{width:18px;height:18px}}\n@media(max-width:1100px){\n .td-info-inner{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);padding:3px 16px}\n .td-info-item{justify-content:flex-start;padding:6px 13px;font-size:12px;gap:8px;line-height:1.25}\n .td-info-item+.td-info-item{border-left:0}\n .td-info-item:nth-child(even){border-left:1px solid rgba(242,255,255,.45)}\n .td-info-item:nth-child(n+3){border-top:1px solid rgba(242,255,255,.2)}\n .td-info-icon{width:18px;height:18px}\n}\n@media(max-width:560px){\n .td-info-inner{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);padding:2px 8px}\n .td-info-item{align-items:flex-start;padding:7px 5px;gap:5px;font-size:10.3px;line-height:1.28;letter-spacing:-.01em}\n .td-info-icon{width:15px;height:15px;margin-top:1px}\n .td-info-label{hyphens:auto}\n}\n@media(max-width:360px){.td-info-item{font-size:9.6px;gap:4px}.td-info-icon{width:14px;height:14px}}\n";
