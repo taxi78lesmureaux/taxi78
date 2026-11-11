@@ -1120,12 +1120,81 @@ const td78FinalLogoCSS = "\n/* Final approved header logo only, Nov 11 */\n.f-he
 }
 
 `;
+    const td78FullFleetFixCSS=String.raw`
+/* TD78_FLEET_FULL_CARS_TITLE_ON_ONE_LINE_20261111
+   Four balanced desktop cards; no destructive changes to other site sections. */
+@media(min-width:781px){
+ .td78-desktop-fleet>a{height:clamp(178px,17.8vw,255px)!important;}
+ .td78-desktop-vehicle-card{justify-content:stretch!important}
+ .td78-desktop-vehicle-visual{
+   box-sizing:border-box;display:block!important;width:100%!important;
+   height:auto!important;flex:1 1 auto!important;min-height:0;
+   aspect-ratio:auto!important;overflow:hidden;
+ }
+ .td78-desktop-vehicle-visual .td78-mobile-art{
+   display:block!important;width:100%!important;height:100%!important;
+   aspect-ratio:auto!important;min-height:0!important;
+   background-repeat:no-repeat!important;background-size:295% auto!important;
+ }
+ .td78-desktop-vehicle-visual .td78-mobile-art-taxi{
+   background-position:5.5% 80%!important;
+ }
+ .td78-desktop-vehicle-visual .td78-mobile-art-van{
+   background-position:50% 80%!important;
+ }
+ .td78-desktop-vehicle-visual .td78-mobile-art-prestige{
+   background-position:94.5% 80%!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card{
+   grid-template-columns:clamp(35px,3.8vw,50px) minmax(0,1fr)!important;
+   grid-template-rows:clamp(44px,5.4vw,62px) minmax(0,1fr) clamp(48px,5vw,64px)!important;
+   grid-template-areas:"icon body" "photo photo" "cta cta"!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-icon{
+   grid-area:icon!important;width:clamp(28px,3.1vw,43px)!important;
+   height:clamp(28px,3.1vw,43px)!important;margin:auto!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-body{
+   grid-area:body!important;align-self:center;overflow:visible!important;
+   padding:3px 8px 3px 0!important;gap:3px!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-body strong{
+   display:block;white-space:nowrap!important;overflow:visible!important;
+   font-size:clamp(12px,1.25vw,18px)!important;letter-spacing:-.025em!important;
+   line-height:1.1!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-caption{
+   font-size:clamp(9px,.88vw,13px)!important;line-height:1.15!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-mondeo-photo{
+   grid-area:photo!important;width:100%!important;height:100%!important;
+   min-height:0!important;max-height:100%!important;
+   background-position:center center!important;background-size:contain!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-seal{
+   top:clamp(48px,5.8vw,66px)!important;right:6px!important;
+   width:clamp(26px,3vw,39px)!important;height:auto!important;
+   pointer-events:none;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-cta{
+   grid-area:cta!important;align-self:center!important;
+ }
+}
+@media(min-width:781px) and (max-width:940px){
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-body strong{
+   font-size:clamp(11px,1.33vw,13px)!important;
+ }
+ .td78-desktop-fleet .td78-mondeo-card .td78-cpam-caption{
+   font-size:9px!important;
+ }
+}
+`;
     const td78BookLinkJS="\n<script id=\"td78-card-booking-link\">document.addEventListener('click',function(e){const a=e.target.closest('[data-td78-type]');if(!a)return;const val=a.getAttribute('data-td78-type');const input=document.querySelector('#f-booking input[name=\"type\"][value=\"'+val+'\"]');if(input){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}})</script>";
   const topInfoBarCSS="\n/* TD78_RESPONSIVE_INFO_TOPBAR_20261109 — four information points like approved screenshot */\n.td-info-bar{position:relative;isolation:isolate;z-index:81;display:block;width:100%;background:linear-gradient(100deg,#004f61 0%,#006674 48%,#007981 100%);color:#fff;border-bottom:1px solid rgba(104,242,231,.6);box-shadow:inset 0 -1px rgba(0,35,47,.25)}\n.td-info-inner{width:min(100%,1720px);min-height:42px;margin-inline:auto;padding:0 21px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.7fr) minmax(0,1.05fr) minmax(0,1.44fr);align-items:stretch}\n.td-info-item{display:flex;gap:9px;align-items:center;justify-content:center;padding:9px 12px;min-width:0;font-size:clamp(11px,.87vw,15px);font-weight:750;letter-spacing:-.015em;line-height:1.2;text-align:left}\n.td-info-item+.td-info-item{border-left:1px solid rgba(242,255,255,.64)}\n.td-info-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}\n.td-info-icon svg{width:100%;height:100%;display:block}\n.td-info-label{min-width:0;overflow-wrap:normal}\n@media(min-width:1101px) and (max-width:1380px){.td-info-inner{padding-inline:12px}.td-info-item{padding-inline:8px;font-size:11.5px;gap:6px}.td-info-icon{width:18px;height:18px}}\n@media(max-width:1100px){\n .td-info-inner{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);padding:3px 16px}\n .td-info-item{justify-content:flex-start;padding:6px 13px;font-size:12px;gap:8px;line-height:1.25}\n .td-info-item+.td-info-item{border-left:0}\n .td-info-item:nth-child(even){border-left:1px solid rgba(242,255,255,.45)}\n .td-info-item:nth-child(n+3){border-top:1px solid rgba(242,255,255,.2)}\n .td-info-icon{width:18px;height:18px}\n}\n@media(max-width:560px){\n .td-info-inner{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);padding:2px 8px}\n .td-info-item{align-items:flex-start;padding:7px 5px;gap:5px;font-size:10.3px;line-height:1.28;letter-spacing:-.01em}\n .td-info-icon{width:15px;height:15px;margin-top:1px}\n .td-info-label{hyphens:auto}\n}\n@media(max-width:360px){.td-info-item{font-size:9.6px;gap:4px}.td-info-icon{width:14px;height:14px}}\n";
   function render(path,host){
     const p=pages.find(x=>x[0]===path), preview=host.endsWith(".pages.dev")||host.endsWith(".workers.dev")||host==="localhost", found=!!p;
     const title=found?p[1]:"Page introuvable | TaxiDirect",desc=found?p[2]:"Page indisponible",canonical=official+path;
-    return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0053B4"><meta name="robots" content="${preview||!found?"noindex,nofollow":"index,follow,max-image-preview:large"}"><title>${title}</title><meta name="description" content="${desc}">${!preview&&found?`<link rel="canonical" href="${canonical}">`:""}<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${preview?"https://"+host+path:canonical}"><meta property="og:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><meta property="og:image:alt" content="Taxi conventionné TaxiDirect au crépuscule"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${desc}"><meta name="twitter:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="preconnect" href="https://www.taxidirect78conventionne.fr" crossorigin>${path==="/"?`<link rel="preload" as="image" href="/td78-approved-art-v3.png" fetchpriority="high">`:""}<style>${css}${futuristicCSS}${noFaceCSS}${fidelityCSS}${extraMatchCSS}${layoutFixCSS}${noBlankCSS}${brandRepairCSS}${contactRedesignCSS}${bookingConsistencyCSS}${trustBarCSS}${formBackendCSS}${activeMenuCSS}${touchMenuCSS}${crispBrandCSS}${footerLogoSizingCSS}${footerV2CSS}${desktopTabletMenuCSS}${contactAndVehiclePolishCSS}${bookingPageChoiceCSS}${mobileHeaderAlignmentCSS}${desktopHeroTitleCSS}${cookieCSS}${desktopMenuHoverCSS}${topInfoBarCSS}${td78VisualCSS}${headerLogoFitCSS}${svgHeaderCSS}${td78FinalLogoCSS}${approvedLogoThemeCSS}${td78PaletteFinishingCSS}${td78ConventionCSS}${td78MondeoFirstCSS}${td78DesktopFourCSS}</style>${!preview&&found?`<script type="application/ld+json">${graph(p,canonical)}</script>`:""}</head><body>${header(path)}<main id="main">${bodyFor(path)}</main>${footer()}${attachHeaderControls()}${desktopMenuHoverJS()}${cookieConsentUi()}${path==="/"?td78BookLinkJS:""}</body></html>`;
+    return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0053B4"><meta name="robots" content="${preview||!found?"noindex,nofollow":"index,follow,max-image-preview:large"}"><title>${title}</title><meta name="description" content="${desc}">${!preview&&found?`<link rel="canonical" href="${canonical}">`:""}<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${preview?"https://"+host+path:canonical}"><meta property="og:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><meta property="og:image:alt" content="Taxi conventionné TaxiDirect au crépuscule"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${desc}"><meta name="twitter:image" content="${official}/taxidirect78-logo-hd-20261108.webp"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="preconnect" href="https://www.taxidirect78conventionne.fr" crossorigin>${path==="/"?`<link rel="preload" as="image" href="/td78-approved-art-v3.png" fetchpriority="high">`:""}<style>${css}${futuristicCSS}${noFaceCSS}${fidelityCSS}${extraMatchCSS}${layoutFixCSS}${noBlankCSS}${brandRepairCSS}${contactRedesignCSS}${bookingConsistencyCSS}${trustBarCSS}${formBackendCSS}${activeMenuCSS}${touchMenuCSS}${crispBrandCSS}${footerLogoSizingCSS}${footerV2CSS}${desktopTabletMenuCSS}${contactAndVehiclePolishCSS}${bookingPageChoiceCSS}${mobileHeaderAlignmentCSS}${desktopHeroTitleCSS}${cookieCSS}${desktopMenuHoverCSS}${topInfoBarCSS}${td78VisualCSS}${headerLogoFitCSS}${svgHeaderCSS}${td78FinalLogoCSS}${approvedLogoThemeCSS}${td78PaletteFinishingCSS}${td78ConventionCSS}${td78MondeoFirstCSS}${td78DesktopFourCSS}${td78FullFleetFixCSS}</style>${!preview&&found?`<script type="application/ld+json">${graph(p,canonical)}</script>`:""}</head><body>${header(path)}<main id="main">${bodyFor(path)}</main>${footer()}${attachHeaderControls()}${desktopMenuHoverJS()}${cookieConsentUi()}${path==="/"?td78BookLinkJS:""}</body></html>`;
   }
   const favicon=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#293442"/><path d="M8 16h26v8h-9v29h-9V24H8z" fill="#FFC400"/><path d="M33 16h8c12 0 17 8 17 18s-5 19-17 19h-8V16zm9 9v19c5-1 7-4 7-10s-2-8-7-9" fill="#0053B4"/><path d="M8 56c13-8 29-8 46 0" stroke="#FFC400" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
   return {pages,render,async fetch(request,env){
