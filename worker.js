@@ -1109,42 +1109,13 @@ const td78FinalLogoCSS = "\n/* Final approved header logo only, Nov 11 */\n.f-he
  .td78-desktop-fleet .td78-mondeo-card .td78-mondeo-photo{background-position:center center!important;background-size:contain!important}
  .td78-desktop-fleet .td78-mondeo-card .td78-cpam-seal{right:39%;max-width:42px}
 }
-/* TD78_ALIGN_4_VEHICLES_20261111 — supprimer les filets intégrés à la planche photo et
-   aligner les titres, les carrosseries et les CTA avec la carte Taxi conventionné.
-   Uniquement desktop/tablette : ne pas toucher aux cartes mobiles ni à la bannière. */
+/* TD78_ALIGN_4_VEHICLES_20261111 — traits effacés sans déplacer les photos ni les textes.
+   Les quatre cartes étaient déjà correctement alignées : conserver le cadrage d'origine. */
 @media (min-width:781px){
- .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual{
-   flex:1 1 auto!important;
-   height:auto!important;
-   min-height:0!important;
-   aspect-ratio:auto!important;
-   overflow:hidden!important;
-   background:#fff!important;
- }
- .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art{
-   width:100%!important;
-   height:100%!important;
-   aspect-ratio:auto!important;
-   background-position:3.47% 55%!important;
- }
- .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art-van{
-   background-position:49.19% 55%!important;
- }
- .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual .td78-mobile-art-prestige{
-   background-position:95.2% 55%!important;
- }
- /* Les trois traits vert/jaune/vert sont imprimés dans l'ancienne illustration.
-    La nouvelle fenêtre les recadre; ce cache blanc efface tout résidu en bas. */
  .td78-desktop-fleet>.td78-desktop-vehicle-card .td78-desktop-vehicle-visual::after{
-   content:"";
-   position:absolute;
-   left:0;
-   right:0;
-   bottom:0;
-   height:clamp(5px,.6vw,10px);
-   background:#fff;
-   pointer-events:none;
-   z-index:2;
+  content:"";position:absolute;left:0;right:0;bottom:0;
+  height:clamp(9px,.85vw,14px);
+  background:#fff;z-index:2;pointer-events:none;
  }
 }
 
