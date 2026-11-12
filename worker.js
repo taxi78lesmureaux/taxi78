@@ -795,7 +795,7 @@ const cards=[["Taxi classique","Taxi classique","taxi"],["Van ou minibus","Van",
 return '<section class="td78-photo-showcase" aria-label="Taxi conventionné CPAM dans les Yvelines : présentation et réservation">'
 +'<h1 class="td78-sr-only">Taxi conventionné CPAM dans les Yvelines (78), TaxiDirect 78</h1>'
 +'<div class="td78-desktop-reference"><div class="td78-desktop-art" role="img" aria-label="Mercedes noire TaxiDirect78 et présentation des services de taxi"></div></div>'
-+'<div class="td78-desktop-fleet" aria-label="Choisissez votre véhicule">'+td78CpamCard()+cards.map(c=>'<a href="#reservation-rapide" class="td78-desktop-vehicle-card td78-fleet-photo-card" data-td78-type="'+c[1]+'" aria-label="Réserver : '+c[0]+'"><span class="td78-desktop-vehicle-heading"><span class="td78-fleet-icon">'+vehicleIcon(c[2])+'</span><span class="td78-fleet-copy"><strong>'+(c[2]==='van'?'Van / Minibus':c[0])+'</strong><small>'+(c[2]==='taxi'?'1 à 4 passagers':c[2]==='van'?'5 à 8 passagers':'Confort et élégance')+'</small></span></span><span class="td78-fleet-picture"><img class="td78-fleet-img" src="'+td78FleetImageUrl(c[2])+'" alt="'+td78FleetImageAlt(c[2])+'" width="640" height="480" loading="eager" decoding="async"></span><span class="td78-desktop-vehicle-cta">▦ '+(c[2]==='taxi'?'Réserver un taxi':c[2]==='van'?'Réserver un van':'Réserver une berline')+' <b aria-hidden="true">›</b></span></a>').join("")+'</div>'
++'<div class="td78-desktop-fleet" aria-label="Choisissez votre véhicule">'+td78CpamCard()+cards.map(c=>'<a href="#reservation-rapide" class="td78-desktop-vehicle-card td78-fleet-photo-card" data-td78-type="'+c[1]+'" aria-label="Réserver : '+c[0]+'"><span class="td78-fleet-head"><span class="td78-fleet-head-copy"><strong>'+(c[2]==='van'?'Van / Minibus':c[0])+'</strong><small>'+(c[2]==='taxi'?'1 à 4 passagers':c[2]==='van'?'5 à 8 passagers':'Confort et élégance')+'</small></span><span class="td78-fleet-head-icon">'+vehicleIcon(c[2])+'</span></span><span class="td78-fleet-picture"><img class="td78-fleet-img" src="'+td78FleetImageUrl(c[2])+'" alt="'+td78FleetImageAlt(c[2])+'" width="640" height="480" loading="eager" decoding="async"></span><span class="td78-desktop-vehicle-cta">▦ '+(c[2]==='taxi'?'Réserver un taxi':c[2]==='van'?'Réserver un van':'Réserver une berline')+' <b aria-hidden="true">›</b></span></a>').join("")+'</div>'
 +'<div class="td78-mobile-reference"><div class="td78-mobile-hero">'
 +'<div class="td78-mobile-hero-bg" role="img" aria-label="Mercedes TaxiDirect 78 avec lumineux moderne"></div>'
 +'<div class="td78-mobile-copy"><span>TRANSPORTS MÉDICAUX • LES YVELINES</span><h2>Taxi conventionné <em>CPAM</em><br>dans les Yvelines (78)</h2>'
@@ -1266,6 +1266,26 @@ const td78FleetPhotoCSS=String.raw`
 .td78-photo-showcase .td78-fleet-photo-card:hover .td78-mobile-vehicle-cta,
 .td78-photo-showcase .td78-fleet-photo-card:hover .td78-desktop-vehicle-cta{background:#003f92!important}
 .td78-photo-showcase .td78-fleet-photo-card:focus-visible{outline:3px solid #ffc400!important;outline-offset:3px!important}
+
+.td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-copy strong{
+  display:block!important;white-space:normal!important;overflow-wrap:normal!important;
+  letter-spacing:-.02em!important
+}
+.td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-copy small{
+  display:block!important;white-space:normal!important
+}
+.td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-icon{
+  box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:34px!important;height:34px!important;flex:0 0 34px!important;max-width:34px!important;
+  border-radius:50%!important;background:#eef4ff!important;color:#0053b4!important;
+  overflow:hidden!important
+}
+.td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-icon .f-vehicle-icon{display:block!important;width:25px!important;height:25px!important}
+.td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-icon svg{display:block!important;width:24px!important;height:24px!important}
+@media(min-width:781px){
+ .td78-photo-showcase .td78-desktop-fleet .td78-fleet-photo-card .td78-fleet-head-copy strong{font-size:clamp(12px,1.22vw,18px)!important}
+ .td78-photo-showcase .td78-desktop-fleet .td78-fleet-photo-card .td78-fleet-head-copy small{font-size:clamp(10px,.9vw,13px)!important}
+}
 @media(min-width:781px){
  .td78-photo-showcase .td78-desktop-fleet{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:clamp(8px,1.1vw,18px)!important}
  .td78-photo-showcase .td78-desktop-fleet>a.td78-fleet-photo-card{height:clamp(247px,23vw,325px)!important;min-height:0!important;max-height:325px!important}
