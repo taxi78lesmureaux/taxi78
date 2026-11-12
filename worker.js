@@ -1327,7 +1327,7 @@ const td78FleetPhotoCSS=String.raw`
 .td78-photo-showcase .td78-fleet-photo-card .td78-fleet-head-copy small,
 .td78-photo-showcase .td78-fleet-photo-card .td78-mobile-vehicle-heading small,
 .td78-photo-showcase .td78-fleet-photo-card .td78-desktop-vehicle-heading small{
-  color:var(--brand-muted,#606B77)!important;
+  color:var(--brand-ink,#293442)!important;
 }
 `;
   const td78BookLinkJS="\n<script id=\"td78-card-booking-link\">document.addEventListener('click',function(e){const a=e.target.closest('[data-td78-type]');if(!a)return;const val=a.getAttribute('data-td78-type');const input=document.querySelector('#f-booking input[name=\"type\"][value=\"'+val+'\"]');if(input){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}})</script>";
